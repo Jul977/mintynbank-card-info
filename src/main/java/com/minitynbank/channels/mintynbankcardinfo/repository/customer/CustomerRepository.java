@@ -1,6 +1,6 @@
-package com.minitynbank.channels.mintynbankcardinfo.repository;
+package com.minitynbank.channels.mintynbankcardinfo.repository.customer;
 
-import com.minitynbank.channels.mintynbankcardinfo.repository.model.CustomerModel;
+import com.minitynbank.channels.mintynbankcardinfo.repository.customer.model.CustomerModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

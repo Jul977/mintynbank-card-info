@@ -6,5 +6,9 @@ package com.minitynbank.channels.mintynbankcardinfo.common.constants;
  */
 public class Constants {
 
-    public static final String CUSTOMER_NOT_FOUND = "customer with email %s not found";
+    public static final String CUSTOMER_NOT_FOUND = "customer with email %s not found!";
+
+    public static final String INVALID_EMAIL_SUPPLIED = "the email %s is invalid!";
+
+    public static final String EMAIL_ALREADY_TAKEN = "the email %s is already taken!";
 }

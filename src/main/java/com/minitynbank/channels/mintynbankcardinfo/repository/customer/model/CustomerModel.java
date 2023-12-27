@@ -1,7 +1,6 @@
-package com.minitynbank.channels.mintynbankcardinfo.repository.model;
+package com.minitynbank.channels.mintynbankcardinfo.repository.customer.model;
 
 import com.minitynbank.channels.mintynbankcardinfo.common.enums.CustomerRoleEnum;
-import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -9,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -78,7 +78,7 @@ public class CustomerModel implements UserDetails {
             nullable = false
     )
     @Enumerated(EnumType.STRING)
-    private CustomerRoleEnum customerRole;
+    private CustomerRoleEnum role;
 
     @Column(
             name = "is_enabled",
@@ -95,13 +95,13 @@ public class CustomerModel implements UserDetails {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.password = password;
-        this.customerRole = customerRole;
+        this.role = customerRole;
         this.enabled = enabled;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(customerRole.name());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.name());
         return Collections.singletonList(authority);
     }
 

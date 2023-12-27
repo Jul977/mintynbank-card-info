@@ -1,4 +1,4 @@
-package com.minitynbank.cahnnels.mintynbankcardinfo;
+package com.minitynbank.channels.mintynbankcardinfo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
