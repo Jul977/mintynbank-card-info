@@ -7,13 +7,11 @@ import lombok.Data;
  * @since 27/12/2023
  */
 @Data
-public class CustomerBaseResponse {
+public class CustomerRegistrationResponse {
 
     private boolean status;
 
     private String message;
-
-    private String token;
 
     public boolean getStatus() {
         return this.status;

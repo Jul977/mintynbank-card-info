@@ -8,7 +8,7 @@ import lombok.Data;
  * @since 27/12/2023
  */
 @Data
-public class CustomerServiceParam {
+public class CustomerRegistrationServiceParam {
 
     private String firstName;
 

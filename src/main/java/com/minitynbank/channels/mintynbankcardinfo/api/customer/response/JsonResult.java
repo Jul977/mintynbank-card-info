@@ -18,10 +18,18 @@ public class JsonResult<T> {
     private JsonResult() {
     }
 
-    public static <T> JsonResult<T> signUpResult(CustomerBaseResponse response) {
+    public static <T> JsonResult<T> signUpResult(CustomerRegistrationResponse response) {
         JsonResult<T> result = new JsonResult<>();
         result.setStatus(response.getStatus());
         result.setMessage(response.getMessage());
+        return result;
+    }
+
+    public static <T> JsonResult<T> loginResult(CustomerLoginResponse response) {
+        JsonResult<T> result = new JsonResult<>();
+        result.setStatus(response.getStatus());
+        result.setMessage(response.getMessage());
+        result.setToken(response.getToken());
         return result;
     }
 }
