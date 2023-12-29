@@ -15,8 +15,15 @@ public class JsonResult<T> {
 
     private String token;
 
-    private JsonResult() {
+    public JsonResult(boolean status, String message, String token) {
+        this.status = status;
+        this.message = message;
+        this.token = token;
     }
+
+    public JsonResult() {
+    }
+
 
     public static <T> JsonResult<T> signUpResult(CustomerRegistrationResponse response) {
         JsonResult<T> result = new JsonResult<>();

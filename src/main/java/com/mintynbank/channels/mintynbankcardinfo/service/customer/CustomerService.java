@@ -10,7 +10,6 @@ import com.mintynbank.channels.mintynbankcardinfo.repository.customer.convert.Cu
 import com.mintynbank.channels.mintynbankcardinfo.repository.customer.model.CustomerModel;
 import com.mintynbank.channels.mintynbankcardinfo.repository.customer.param.CustomerLoginServiceParam;
 import com.mintynbank.channels.mintynbankcardinfo.repository.customer.param.CustomerRegistrationServiceParam;
-import com.mintynbank.channels.mintynbankcardinfo.repository.token.AccessTokenRepository;
 import com.mintynbank.channels.mintynbankcardinfo.repository.token.model.AccessTokenModel;
 import com.mintynbank.channels.mintynbankcardinfo.service.token.AccessTokenService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,7 +40,7 @@ public class CustomerService implements UserDetailsService {
     private final EmailValidator emailValidator;
 
 
-    public CustomerService(CustomerRepository customerRepository, AccessTokenRepository accessTokenRepository, AccessTokenService accessTokenService, EmailValidator emailValidator, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public CustomerService(CustomerRepository customerRepository, AccessTokenService accessTokenService, EmailValidator emailValidator, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.customerRepository = customerRepository;
         this.accessTokenService = accessTokenService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -63,9 +62,8 @@ public class CustomerService implements UserDetailsService {
         // validate the email supplied
         boolean isValidEmail = emailValidator.test(request.getEmail());
         if (!isValidEmail) {
-            throw new IllegalStateException(String.format(INVALID_EMAIL_SUPPLIED, request.getEmail()));
+            return invalidEmailSupplied(request.getEmail());
         }
-
         // signUp the customer
         CustomerRegistrationServiceParam serviceParam = CustomerServiceConvert.convertToServiceParam(request);
         return signUpCustomer(serviceParam);
@@ -76,20 +74,15 @@ public class CustomerService implements UserDetailsService {
         // check if the customer already exists
         boolean customerExists = customerRepository.findByEmail(customerRepModel.getEmail()).isPresent();
         if (customerExists) {
-            throw new IllegalStateException(String.format(EMAIL_ALREADY_TAKEN, serviceParam.getEmail()));
+            return emailAlreadyTaken(customerRepModel.getEmail());
         }
         // encode the supplied password
         String encodedPassword = bCryptPasswordEncoder.encode(serviceParam.getPassword());
 
         customerRepModel.setPassword(encodedPassword);
-
         // save the customer to database
         customerRepository.save(customerRepModel);
-
-        CustomerRegistrationResponse response = new CustomerRegistrationResponse();
-        response.setStatus(true);
-        response.setMessage(REGISTRATION_SUCCESSFUL);
-        return response;
+        return registrationSuccess();
     }
 
     public CustomerLoginResponse login(CustomerLoginRequest request) {
@@ -116,20 +109,14 @@ public class CustomerService implements UserDetailsService {
 
         // fetch the customer's token record by id
         Optional<AccessTokenModel> oldTokenModel = accessTokenService.getByCustomerId(customer.getId().toString());
-        // if record exists check if it's expired and return old token
-        if (oldTokenModel.isPresent()) {
-            AccessTokenModel tokenModel  = oldTokenModel.get();
-            // update the token if expired
-            if (tokenModel.getExpiresAt().isBefore(LocalDateTime.now())) {
-                tokenModel.setToken(UUID.randomUUID().toString());
-                tokenModel.setLoggedInAt(LocalDateTime.now());
-                tokenModel.setExpiresAt(LocalDateTime.now().plusMinutes(10));
 
-                int count = accessTokenService.updateAccessToken(tokenModel);
-                if (count > 0) {
-                    return loginSuccessful(tokenModel.getToken());
-                }
-                return loginFailure();
+        if (oldTokenModel.isPresent()) {
+            AccessTokenModel tokenModel = oldTokenModel.get();
+
+            if (tokenModel.getExpiresAt().isBefore(LocalDateTime.now())) {
+                // Update the token if expired
+                tokenModel = updateToken(tokenModel);
+                return (tokenModel != null) ? loginSuccessful(tokenModel.getToken()) : loginFailure();
             }
             return loginSuccessful(tokenModel.getToken());
         }
@@ -150,6 +137,16 @@ public class CustomerService implements UserDetailsService {
 
     }
 
+    private AccessTokenModel updateToken(AccessTokenModel tokenModel) {
+        tokenModel.setToken(UUID.randomUUID().toString());
+        tokenModel.setLoggedInAt(LocalDateTime.now());
+        tokenModel.setExpiresAt(LocalDateTime.now().plusMinutes(10));
+
+        int count = accessTokenService.updateAccessToken(tokenModel);
+
+        return (count > 0) ? tokenModel : null;
+    }
+
     private CustomerLoginResponse invalidCredentials () {
         CustomerLoginResponse response = new CustomerLoginResponse();
         response.setStatus(false);
@@ -167,8 +164,29 @@ public class CustomerService implements UserDetailsService {
 
     private CustomerLoginResponse loginFailure () {
         CustomerLoginResponse response = new CustomerLoginResponse();
-        response.setStatus(true);
+        response.setStatus(false);
         response.setMessage(LOGIN_FAILURE);
+        return response;
+    }
+
+    private CustomerRegistrationResponse registrationSuccess () {
+        CustomerRegistrationResponse response = new CustomerRegistrationResponse();
+        response.setStatus(true);
+        response.setMessage(REGISTRATION_SUCCESSFUL);
+        return response;
+    }
+
+    private CustomerRegistrationResponse invalidEmailSupplied (String email) {
+        CustomerRegistrationResponse response = new CustomerRegistrationResponse();
+        response.setStatus(false);
+        response.setMessage(String.format(INVALID_EMAIL_SUPPLIED, email));
+        return response;
+    }
+
+    private CustomerRegistrationResponse emailAlreadyTaken (String email) {
+        CustomerRegistrationResponse response = new CustomerRegistrationResponse();
+        response.setStatus(false);
+        response.setMessage(String.format(EMAIL_ALREADY_TAKEN, email));
         return response;
     }
 }

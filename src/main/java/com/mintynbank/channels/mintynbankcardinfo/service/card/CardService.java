@@ -5,9 +5,10 @@ import com.mintynbank.channels.mintynbankcardinfo.client.CardClient;
 import com.mintynbank.channels.mintynbankcardinfo.client.response.CardClientLookupResponse;
 import com.mintynbank.channels.mintynbankcardinfo.client.response.ClientRequestResponse;
 import com.mintynbank.channels.mintynbankcardinfo.service.card.convert.CardServiceConvert;
-import com.mintynbank.channels.mintynbankcardinfo.common.constants.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import static com.mintynbank.channels.mintynbankcardinfo.common.constants.Constants.*;
 
 /**
  * @author Emmanuel-Irabor
@@ -28,12 +29,18 @@ public class CardService {
         // call the third-party client to verify the bin
         ClientRequestResponse clientRequestResponse = cardClient.doCardLookUp(cardBin);
         log.info("card verify client requestResponse, {}", clientRequestResponse);
+        CardClientLookupResponse clientResponse = CardClientLookupResponse.build(clientRequestResponse.getResponseBody());
 
-        if(Constants.SUCCESS_CODE_200.equals(clientRequestResponse.getResponseCode()) && clientRequestResponse.getResponseBody() != null) {
-            CardClientLookupResponse clientResponse = CardClientLookupResponse.build(clientRequestResponse.getResponseBody());
+        if(SUCCESS_CODE_200.equals(clientRequestResponse.getResponseCode()) && clientResponse != null) {
             log.info("card verify service response, response:{}", clientResponse);
             return CardServiceConvert.convertToResponse(clientResponse, true);
         }
-        return CardServiceConvert.convertToResponse(null, false);
+
+        if(ERROR_CODE_429.equals(clientRequestResponse.getResponseCode())) {
+            return CardServiceConvert.toLimitExceededResponse();
+        }
+
+        // else return false
+        return CardServiceConvert.convertToResponse(clientResponse, false);
     }
 }

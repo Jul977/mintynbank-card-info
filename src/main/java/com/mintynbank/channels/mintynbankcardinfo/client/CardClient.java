@@ -2,6 +2,7 @@ package com.mintynbank.channels.mintynbankcardinfo.client;
 
 import com.mintynbank.channels.mintynbankcardinfo.client.config.CardProperties;
 import com.mintynbank.channels.mintynbankcardinfo.client.response.ClientRequestResponse;
+import com.mintynbank.channels.mintynbankcardinfo.client.util.TokenBucket;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,13 +19,16 @@ import static com.mintynbank.channels.mintynbankcardinfo.common.constants.Consta
 @Service
 public class CardClient {
 
-   private final CardProperties cardProperties;
+    private final CardProperties cardProperties;
 
     private final WebClient webClient;
 
-    public CardClient(CardProperties cardLookupProperties) {
+    private final TokenBucket tokenBucket;
+
+    public CardClient(CardProperties cardLookupProperties, TokenBucket tokenBucket) {
         this.cardProperties = cardLookupProperties;
         this.webClient = WebClient.create(cardLookupProperties.getBaseUrl());
+        this.tokenBucket = tokenBucket;
     }
 
     public ClientRequestResponse doCardLookUp(String cardBin) {
@@ -35,9 +39,15 @@ public class CardClient {
         result.setUrl(cardProperties.getBaseUrl() + endPoint);
 
         try {
-            ApiResponse apiResponse = makeApiCall(endPoint);
-            setRequestResponseInfo(apiResponse, result);
-            log.info("Card lookup client api call, requestResponse:{}", result);
+            // Check if a token can be consumed
+            if (tokenBucket.tryConsume()) {
+                ApiResponse apiResponse = makeApiCall(endPoint);
+                setRequestResponseInfo(apiResponse, result);
+                log.info("Card lookup client api call, requestResponse:{}", result);
+            } else {
+                log.info("Rate limit exceeded. Unable to make API call.");
+                result.setResponseCode(ERROR_CODE_429);
+            }
         } catch (Exception e) {
             log.error("Card lookup client exception, reason:{}", e.getMessage());
             result.setResponseCode(ERROR_CODE_500);

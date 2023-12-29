@@ -22,5 +22,17 @@ public class Constants {
 
     public static final String SUCCESS_CODE_200 = "200";
 
-    public static final String ERROR_CODE_500 = "ERROR_CODE_500";
+    public static final String ERROR_CODE_500 = "500";
+
+    public static final String ERROR_CODE_429 = "429";
+
+    public static final String INVALID_TOKEN_SUPPLIED = "Invalid token supplied!";
+
+    public static final String SUCCESS = "Successful";
+
+    public static final String FAILED = "Request failed";
+
+    public static final String SERVICE_UNAVAILABLE = "Service unavailable, Please try again later!";
+
+    public static final String INTERNAL_SERVER_ERROR = "Internal server error";
 }

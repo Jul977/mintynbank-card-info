@@ -28,12 +28,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/v*/customer/**")
+                .antMatchers("/api/v1/customer/**")
+                .permitAll()
+                .antMatchers("/api/v1/card-scheme/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated().and()
                 .formLogin();
     }
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {

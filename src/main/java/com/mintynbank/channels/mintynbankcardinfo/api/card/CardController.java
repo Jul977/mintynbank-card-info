@@ -3,8 +3,11 @@ package com.mintynbank.channels.mintynbankcardinfo.api.card;
 import com.mintynbank.channels.mintynbankcardinfo.api.card.response.CardVerifyResponse;
 import com.mintynbank.channels.mintynbankcardinfo.service.card.CardService;
 import com.mintynbank.channels.mintynbankcardinfo.service.token.AccessTokenService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static com.mintynbank.channels.mintynbankcardinfo.common.constants.Constants.*;
 
 /**
  * @author Emmanuel-Irabor
@@ -29,10 +32,22 @@ public class CardController {
         String accessToken = extractTokenFromHeader(authorizationHeader);
         boolean isValid = accessTokenService.validateToken(accessToken);
 
-        //TODO: implement logic if token is invalid
+        if(!isValid) {
+            CardVerifyResponse response = new CardVerifyResponse();
+            response.setSuccess(false);
+            response.setMessage(INVALID_TOKEN_SUPPLIED);
+            return ResponseEntity.ok(response);
+        }
 
-        CardVerifyResponse response = cardService.verifyCard(cardBin);
-        return ResponseEntity.ok(response);
+        try {
+            CardVerifyResponse response = cardService.verifyCard(cardBin);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            CardVerifyResponse response = new CardVerifyResponse();
+            response.setSuccess(false);
+            response.setMessage(INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError().body(response);
+        }
     }
 
     private String extractTokenFromHeader(String authorizationHeader) {

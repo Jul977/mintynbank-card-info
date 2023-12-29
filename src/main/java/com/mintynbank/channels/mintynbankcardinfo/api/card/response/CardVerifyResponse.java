@@ -13,6 +13,8 @@ public class CardVerifyResponse {
 
     private Payload payload;
 
+    private String message;
+
     @Data
     public static class Payload {
 
