@@ -3,6 +3,7 @@ package com.mintynbank.channels.mintynbankcardinfo.api.card;
 import com.mintynbank.channels.mintynbankcardinfo.api.card.response.CardVerifyResponse;
 import com.mintynbank.channels.mintynbankcardinfo.service.card.CardService;
 import com.mintynbank.channels.mintynbankcardinfo.service.token.AccessTokenService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import static com.mintynbank.channels.mintynbankcardinfo.common.constants.Consta
  * @author Emmanuel-Irabor
  * @since 28/12/2023
  */
+@Slf4j
 @RestController
 @RequestMapping(path = "api/v1/card-scheme")
 public class CardController {
@@ -43,6 +45,7 @@ public class CardController {
             CardVerifyResponse response = cardService.verifyCard(cardBin);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            log.error("card verify controller exception", e);
             CardVerifyResponse response = new CardVerifyResponse();
             response.setSuccess(false);
             response.setMessage(INTERNAL_SERVER_ERROR);

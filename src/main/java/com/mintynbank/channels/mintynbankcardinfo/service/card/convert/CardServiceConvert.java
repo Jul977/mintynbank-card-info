@@ -22,7 +22,7 @@ public class CardServiceConvert {
         }
         cardVerifyResponse.setSuccess(status);
         cardVerifyResponse.setMessage(SUCCESS);
-        CardVerifyResponse.Payload payload = cardVerifyResponse.getPayload();
+        CardVerifyResponse.Payload payload = new CardVerifyResponse.Payload();
         payload.setScheme(clientResponse.getScheme());
         payload.setType(clientResponse.getType());
         payload.setBank(clientResponse.getBank().getName());
