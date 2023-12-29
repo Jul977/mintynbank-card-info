@@ -17,6 +17,8 @@ them about the details of his/her card like:
 ## Tools & Technologies used for this project
 - Java (JDK version 17)
 - SpringBoot (version 2.6.2)
+- Maven
+- JPA and Hibernate
 - MySQL Databasee (version 8.0)
 - JUnit
 - Postman
