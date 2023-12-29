@@ -28,7 +28,7 @@ public class TokenBucket {
     private final Lock lock = new ReentrantLock();
 
     // Constants
-    private static final int DEFAULT_CAPACITY = 2;
+    private static final int DEFAULT_CAPACITY = 10;
     private static final int DEFAULT_TOKENS_PER_INTERVAL = 1;
     private static final long DEFAULT_REFILL_INTERVAL = 60 * 1000; // 1 minute
 
