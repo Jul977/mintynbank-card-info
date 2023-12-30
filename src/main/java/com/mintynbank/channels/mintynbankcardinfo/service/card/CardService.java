@@ -33,7 +33,7 @@ public class CardService {
 
         if(SUCCESS_CODE_200.equals(clientRequestResponse.getResponseCode()) && clientResponse != null) {
             log.info("card verify service response, response:{}", clientResponse);
-            return CardServiceConvert.convertToResponse(clientResponse, true);
+            return CardServiceConvert.convertToResponse(clientResponse);
         }
 
         if(ERROR_CODE_429.equals(clientRequestResponse.getResponseCode())) {
@@ -41,6 +41,6 @@ public class CardService {
         }
 
         // else return false
-        return CardServiceConvert.convertToResponse(clientResponse, false);
+        return CardServiceConvert.convertToResponse(clientResponse);
     }
 }

@@ -13,14 +13,14 @@ import static com.mintynbank.channels.mintynbankcardinfo.common.constants.Consta
 @Data
 public class CardServiceConvert {
 
-    public static CardVerifyResponse convertToResponse(CardClientLookupResponse clientResponse, boolean status) {
+    public static CardVerifyResponse convertToResponse(CardClientLookupResponse clientResponse) {
         CardVerifyResponse cardVerifyResponse = new CardVerifyResponse();
         if (clientResponse == null) {
             cardVerifyResponse.setSuccess(false);
             cardVerifyResponse.setMessage(FAILED);
             return cardVerifyResponse;
         }
-        cardVerifyResponse.setSuccess(status);
+        cardVerifyResponse.setSuccess(true);
         cardVerifyResponse.setMessage(SUCCESS);
         CardVerifyResponse.Payload payload = new CardVerifyResponse.Payload();
         payload.setScheme(clientResponse.getScheme());
