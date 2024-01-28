@@ -3,18 +3,23 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      java: corretto21
+      java: 11
+
   pre_build:
     commands:
-      - echo Nothing to do in the pre_build phase...
+      - echo "Executing pre-build commands"
+      # Add any pre-build commands or scripts here
+
   build:
     commands:
-      - echo Build started on `date`
-      - ./mvn/wrapper clean install
-      - mvn -v
+      - echo "Executing build commands"
+      - mvn clean install  # Assuming you are using Maven for your Java project
+
   post_build:
     commands:
-      - echo Build completed on `date`
+      - echo "Executing post-build commands"
+      # Add any post-build commands or scripts here
+
 artifacts:
-  files:
-    - target/messageUtil-1.0.jar
+  files: '**/*'
+  discard-paths: yes
